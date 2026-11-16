@@ -1,0 +1,10 @@
+{
+  "description": "A minimalist toolkit for students to convert temperatures and distances, calculate income tax, explore natural-number sequences, and estimate simple payroll.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
