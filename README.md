@@ -1,4 +1,4 @@
-# 🐻 BearBearCalc – Ice Bear Calculator
+# 🐻‍❄️  BearBearCalc – Ice Bear Calculator
 
 **BearBearCalc** is an ice bear-themed multifunctional calculator website developed using **HTML, CSS, and JavaScript**. It provides a collection of mathematical tools and practical calculation features through a simple, user-friendly interface inspired by an adorable ice bear theme.
 
@@ -82,7 +82,7 @@ BearBearCalc was developed to bring different mathematical and practical calcula
 
 ---
 
-**Made with ❄️ and 🐻 by [dalandanxx](https://github.com/dalandanxx)**
+**Made with ❄️ and 🐻‍❄️  by [dalandanxx](https://github.com/dalandanxx)**
 
 *Stay cool and keep calculating with BearBearCalc!*
 
