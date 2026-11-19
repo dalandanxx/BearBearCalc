@@ -38,11 +38,11 @@ Provides basic employee payroll computation and management features:
 - Allows users to review their calculation history.
 - Makes it easier to refer to previously performed operations.
 
-## 🛠️ Technologies Used
+## 🛠️ Languages Used
 
-The website was developed using the following technologies:
+The website was developed using the following languages:
 
-| Technology | Purpose |
+| Language | Purpose |
 |---|---|
 | HTML5 | Provides the structure and content of the website. |
 | CSS3 | Handles the styling, layout, and ice bear-themed design. |
@@ -85,3 +85,4 @@ BearBearCalc was developed to bring different mathematical and practical calcula
 **Made with ❄️ and 🐻 by [dalandanxx](https://github.com/dalandanxx)**
 
 *Stay cool and keep calculating with BearBearCalc!*
+*IceBear*
