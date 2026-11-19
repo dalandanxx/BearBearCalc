@@ -85,4 +85,5 @@ BearBearCalc was developed to bring different mathematical and practical calcula
 **Made with ❄️ and 🐻 by [dalandanxx](https://github.com/dalandanxx)**
 
 *Stay cool and keep calculating with BearBearCalc!*
+
 *IceBear*
