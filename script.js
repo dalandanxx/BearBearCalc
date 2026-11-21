@@ -1,6 +1,9 @@
 "use strict";
 
 const HISTORY_KEY = "addu-calculation-history";
+const ABOUT_VIDEO_COUNT = 18;
+const ABOUT_MEMORY_COUNT = 6;
+let memoryVideoObserver;
 
 const conversionOptions = [
   { id: "c-f", label: "Celsius to Fahrenheit", from: "°C", to: "°F" },
@@ -125,6 +128,7 @@ function loadHistory() {
 const state = {
   activeTool: "conversion",
   mobileMenu: false,
+  memorySlide: 0,
   history: loadHistory(),
   conversionType: "c-f",
   conversionInput: "",
@@ -544,8 +548,274 @@ function renderHistory() {
     <div class="history-sections">${sections}</div>`;
 }
 
+function renderAbout() {
+  const interests = [
+    ["Chess", "A little strategy, a little patience, and always one more move to consider.", "chess.svg", "Illustrated chessboard and knight"],
+    ["Rubik's cubes", "I like the colors, the patterns, and the satisfying challenge of solving one.", "rubiks-cube.svg", "Illustrated colorful Rubik's cube"],
+    ["The daydreamer", "Anime, movies, manga, manhwa, fantasy, romance, and action.", "daydreamer.svg", "Illustrated books and twinkling stars"],
+    ["The performer", "Dancing has always been one of my favorite ways to express myself.", "public/about/videos/performer.mp4", "Dan dancing in a landscape video"],
+    ["The animal lover", "Dogs, cats, capybaras, hamsters, guinea pigs—and animals in general.", "public/about/videos/animal-lover.mp4", "Dan sharing a moment with animals"],
+    ["The curious one", "I love creating things, learning as I go, and finding another story or skill to explore.", "public/about/videos/curious-one.mp4", "Dan exploring something new"],
+  ];
+
+  const storyChapters = [
+    {
+      number: "01",
+      title: "Tiny me, big dreams",
+      text: "I grew up loving dance, school activities, and trying a little bit of everything. Being a first honor student from kindergarten became part of my childhood, but so did the fun, curious kid behind the certificates.",
+      image: "photo-029.jpg",
+      alt: "Dan as a young child",
+      caption: "Little Dan, already curious about everything.",
+      note: "The early chapters",
+    },
+    {
+      number: "02",
+      title: "Plot twist: computer science",
+      text: "Robotics class introduced me to a path I hadn't expected. It led me toward STEM Pre-Computer Science and, eventually, the Computer Science student I am today. Moving to Davao brought a whole new level of learning outside the classroom, too.",
+      image: "photo-073.jpg",
+      alt: "Dan in a school portrait",
+      caption: "A school-day snapshot from the path that led me to Computer Science.",
+      note: "Growing into my own",
+    },
+    {
+      number: "03",
+      title: "Turns out, I like showing up",
+      text: "From classroom president to student body leadership and Red Cross Youth, I kept finding ways to help out. The titles mattered less than learning to listen, work with people, and be someone a team could count on.",
+      image: "photo-097.jpg",
+      alt: "Dan during Red Cross Youth activities",
+      caption: "A small snapshot from my Red Cross Youth chapter.",
+      note: "People first, always",
+    },
+    {
+      number: "04",
+      title: "The friend group lore",
+      text: "Some favorite memories are simple: laughing until the day flies by, getting outside together, and having people who show up. Even when life changes and friendships take different paths, those moments still mean a lot.",
+      image: "photo-084.jpg",
+      alt: "Dan smiling in a selfie with friends outdoors",
+      caption: "Fresh air, good company, and a memory to keep.",
+      note: "Good days, good people",
+    },
+    {
+      number: "05",
+      title: "Still in my becoming era",
+      text: "I don't have to be at the top or have every step planned out. I'm still ambitious, but I'm learning to take care of myself, enjoy the process, and grow at my own pace.",
+      image: "photo-004.jpg",
+      alt: "A personal photo from Dan's camera roll",
+      caption: "A reminder to meet myself where I am.",
+      note: "Work in progress (in a good way)",
+    },
+  ];
+
+  const memories = [
+    { title: "Little Dan, big day", story: "A tiny throwback to the school days that started it all.", image: "photo-030.jpg", alt: "Dan at a childhood school milestone" },
+    { title: "Growing up, one memory at a time", story: "The early years were full of school activities, new things to try, and lots of little wins.", image: "photo-033.jpg", alt: "Dan during her early school years" },
+    { title: "A curious side quest", story: "There was always something new to learn, make, or figure out.", image: "photo-013.jpg", alt: "Dan smiling in a playful selfie" },
+    { title: "Main character, dance edition", story: "Dancing has always been one of my favorite ways to express myself.", image: "photo-044.jpg", alt: "Dan striking a playful dance pose" },
+    { title: "One for the camera roll", story: "A little snapshot from a life that keeps changing in the best ways.", image: "photo-070.jpg", alt: "A close-up selfie of Dan" },
+    { title: "Good days, kept close", story: "Not every favorite moment needs a big occasion—sometimes the small ones stay with you.", image: "photo-092.jpg", alt: "A favorite personal memory" },
+  ];
+
+  const polaroids = [
+    { image: "photo-012.jpg", alt: "A personal memory from Dan's camera roll", caption: "little things, big memories" },
+    { image: "photo-018.jpg", alt: "A personal memory from Dan's camera roll", caption: "one for the scrapbook" },
+    { image: "photo-055.jpg", alt: "A collage of Dan and her friends", caption: "a day worth keeping" },
+    { image: "photo-061.jpg", alt: "A personal memory from Dan's camera roll", caption: "just happy to be here" },
+  ];
+
+  const filmstripVideo = (index, duplicate = false) => {
+    const number = String(index + 1).padStart(2, "0");
+    return `
+      <div class="filmstrip-frame">
+        <video class="filmstrip-video" data-video-src="public/about/videos/memory-${number}.mp4" muted loop playsinline preload="none" aria-label="Looping memory video ${number}"${duplicate ? ' tabindex="-1" aria-hidden="true"' : ""}></video>
+        <span>${number}</span>
+      </div>`;
+  };
+
+  const dreams = [
+    ["A career in technology", "Finish college, build a meaningful career in technology, and eventually establish my own company abroad."],
+    ["A life of my own", "Build my own home, own a car, and create financial stability and independence."],
+    ["Giving back to family", "Give back to my family and provide them with the opportunities and comfort they deserve."],
+    ["A world of experiences", "Travel around the world, seek new adventures, and make memories with the people I love."],
+  ];
+
+  const activeMemory = memories[((state.memorySlide % memories.length) + memories.length) % memories.length];
+
+  return `
+    <div class="about-page" id="profile">
+      <nav class="about-nav" aria-label="About page navigation">
+        <a href="#profile"><span>01</span> Profile</a>
+        <a href="#gallery"><span>02</span> Gallery</a>
+        <a href="#socials"><span>03</span> Socials</a>
+      </nav>
+
+      <section class="about-hero" aria-labelledby="about-title">
+        <div class="about-photo-main scrapbook-card">
+          <div class="tape tape-left"></div>
+          <div class="portrait-placeholder has-image">
+            <img src="public/about/photos/photo-002.jpg" alt="Dan smiling in a light cardigan" />
+            <div class="portrait-sticker">
+              <span>Dan / Dandan<small>your friendly neighborhood bear</small></span>
+            </div>
+          </div>
+          <p class="polaroid-caption">Hi, I'm Dan! 🍊🐻‍❄️ <span>✦</span></p>
+        </div>
+        <div class="about-intro">
+          <p class="eyebrow">A little introduction</p>
+          <h1 id="about-title">The Bear Behind the Calculator</h1>
+          <p class="about-tagline">A little life behind the pixels, projects, and occasional procrastination.</p>
+          <div class="about-bio">
+            <p>Hello! I'm <strong>Danessah D. Berganio</strong>, but you can call me Dan or Dandan. My family calls me Ne or Shang. And if you've wondered why I associate myself with dalandan, it's because of my nickname! Somewhere along the way, "Dan dan dan dalandan" became an unofficial theme song—and honestly, I've learned to embrace it.</p>
+            <p>I'm a 19-year-old Computer Science student from Malaybalay City, Bukidnon, currently navigating college life in Davao City. I enjoy learning new things, exploring different interests, and taking on challenges—even when I don't know exactly what I'm getting myself into.</p>
+            <p>I'm curious, with a lot going on in my head. I love exploring worlds through anime, movies, manga, and manhwa, and I also enjoy puzzles, chess, dancing, creating things, and spending time with the people and animals I love.</p>
+            <p>Leadership has always been part of me: taking responsibility, organizing activities, and being someone others can rely on. But I've learned there's more to life than achievements, titles, and always being at the top. I'm learning to be independent, appreciate the people around me, embrace my imperfections, and enjoy the process instead of pressuring myself to have everything figured out.</p>
+            <p>At the end of the day, I'm just Dan: a little ambitious, a little chaotic, occasionally a procrastinator, but always someone who wants to make the most out of life.</p>
+            <p class="about-welcome"><strong>Welcome to my little corner of the internet. There's more to this bear than meets the eye!</strong> 🐻‍❄️</p>
+          </div>
+          <div class="profile-mini-grid">
+            <div><span>Display name</span><strong>Dan on Ice</strong></div>
+            <div><span>Also known as</span><strong>Dan / Dandan · Ne / Shang</strong></div>
+            <div><span>From</span><strong>Malaybalay City, Bukidnon</strong></div>
+            <div><span>Studying</span><strong>BS Computer Science</strong></div>
+            <div><span>University</span><strong>Ateneo de Davao University</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section" aria-labelledby="interests-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Current interests</p><h2 id="interests-title">Things I’m into</h2></div>
+          <span class="scribble">stay curious ♡</span>
+        </div>
+        <div class="interest-grid">
+          ${interests.map(([title, detail, illustration, alt], index) => `
+            <article class="interest-card${illustration ? " has-art" : ""}">
+              <span class="interest-number">0${index + 1}</span>
+              ${illustration ? `<div class="interest-art">${illustration.endsWith(".mp4") ? `<video src="${illustration}" muted loop playsinline autoplay preload="metadata" aria-label="${escapeHtml(alt)}"></video>` : `<img src="${illustration.startsWith("public/") ? illustration : `public/about/illustrations/${illustration}`}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" />`}</div>` : ""}
+              <h3>${escapeHtml(title)}</h3>
+              <p>${escapeHtml(detail)}</p>
+            </article>`).join("")}
+        </div>
+        <div class="favorites-row">
+          <span>My favorites</span>
+          <strong>Ice Bear</strong><strong>Food & quality time</strong><strong>Capybaras</strong>
+        </div>
+        <div class="favorite-notes">
+          <p><strong>On repeat:</strong> anime, movies, series, manga & manhwa</p>
+          <p><strong>Favorite genres:</strong> romance, fantasy, action & superpowers</p>
+          <p><strong>To unwind:</strong> reading, dancing, gaming & sleeping</p>
+          <p><strong>Personality:</strong> ENFP-T—one test result, not a permanent definition. Empathetic, patient, curious, resilient, goal-oriented, versatile, creative, and a people person.</p>
+        </div>
+      </section>
+
+      <section class="about-section story-section" aria-labelledby="story-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">The lore so far</p><h2 id="story-title">Little chapters of my life</h2></div>
+        </div>
+        <div class="story-timeline">
+          ${storyChapters.map((chapter, index) => `
+            <article class="story-card${index % 2 ? " story-card-reverse" : ""}">
+              <div class="story-photo">
+                <img src="public/about/photos/${chapter.image}" alt="${escapeHtml(chapter.alt)}" loading="lazy" decoding="async" />
+                <span class="story-photo-number">${chapter.number}</span>
+                <p>${escapeHtml(chapter.caption)}</p>
+              </div>
+              <div class="story-copy">
+                <p class="story-kicker">Chapter ${chapter.number} <span>✦</span> ${escapeHtml(chapter.note)}</p>
+                <h3>${escapeHtml(chapter.title)}</h3>
+                <p>${escapeHtml(chapter.text)}</p>
+              </div>
+            </article>`).join("")}
+        </div>
+      </section>
+
+      <section class="about-section" id="gallery" aria-labelledby="gallery-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">The camera roll</p><h2 id="gallery-title">Little moments, kept close</h2></div>
+        </div>
+        <p class="memory-intro">A living scrapbook of photos and little video moments from my camera roll.</p>
+        <div class="memory-feature">
+          <div class="memory-slide-placeholder">
+            <img src="public/about/photos/${activeMemory.image}" alt="${escapeHtml(activeMemory.alt)}" />
+            <span class="memory-slide-number">${String(state.memorySlide + 1).padStart(2, "0")}</span>
+          </div>
+          <div class="memory-slide-info">
+            <p class="eyebrow">A few favorite frames · ${String(state.memorySlide + 1).padStart(2, "0")} / ${memories.length}</p>
+            <h3>${activeMemory.title}</h3>
+            <p>${activeMemory.story}</p>
+            <div class="memory-controls">
+              <button type="button" data-action="memory-step" data-direction="-1" aria-label="Previous memory">←</button>
+              <span class="memory-counter">${String(state.memorySlide + 1).padStart(2, "0")} / ${memories.length}</span>
+              <button type="button" data-action="memory-step" data-direction="1" aria-label="Next memory">→</button>
+            </div>
+          </div>
+        </div>
+        <div class="memory-polaroids" aria-label="More moments from the camera roll">
+          ${polaroids.map((photo, index) => `
+            <figure class="memory-polaroid memory-polaroid-${index + 1}">
+              <img src="public/about/photos/${photo.image}" alt="${escapeHtml(photo.alt)}" loading="lazy" decoding="async" />
+              <figcaption>${escapeHtml(photo.caption)}</figcaption>
+            </figure>`).join("")}
+        </div>
+        <div class="memory-video-heading">
+          <div><p class="eyebrow">Camera roll, but make it cinema</p><h3>Little moments in motion</h3></div>
+          <span>${ABOUT_VIDEO_COUNT} clips · on an endless loop</span>
+        </div>
+        <div class="memory-filmstrip" aria-label="A continuously moving strip of looping memory videos">
+          <div class="memory-filmstrip-track">
+            <div class="memory-film-reel">
+              ${Array.from({ length: ABOUT_VIDEO_COUNT }, (_, index) => filmstripVideo(index)).join("")}
+            </div>
+            <div class="memory-film-reel" aria-hidden="true">
+              ${Array.from({ length: ABOUT_VIDEO_COUNT }, (_, index) => filmstripVideo(index, true)).join("")}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section" aria-labelledby="dreams-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">A little look ahead</p><h2 id="dreams-title">Things I’m working toward</h2></div>
+        </div>
+        <div class="dream-scrapbook">
+          <div class="dream-grid">
+            ${dreams.map(([title, text], index) => `
+              <article class="dream-card">
+                <span>0${index + 1}</span>
+                <h3>${escapeHtml(title)}</h3>
+                <p>${escapeHtml(text)}</p>
+              </article>`).join("")}
+          </div>
+          <figure class="dream-polaroid">
+            <img src="public/about/photos/photo-020.jpg" alt="Dan enjoying a memorable day with friends" loading="lazy" decoding="async" />
+            <figcaption>little by little, building a life I love</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="about-socials" id="socials" aria-labelledby="socials-title">
+        <div>
+          <p class="eyebrow">Find me online</p>
+          <h2 id="socials-title">Social media</h2>
+        </div>
+        <div class="social-links" aria-label="Social media links">
+          <a class="social-placeholder" href="https://www.instagram.com/by.dalandan/?utm_source=ig_web_button_share_sheet" target="_blank" rel="noopener noreferrer" aria-label="Visit Dan's Instagram profile">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.8" r=".7" class="social-fill"/></svg>
+            <strong>Instagram</strong><span>@by.dalandan</span>
+          </a>
+          <a class="social-placeholder" href="https://www.facebook.com/danessah.berganio/" target="_blank" rel="noopener noreferrer" aria-label="Visit Dan's Facebook profile">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 21v-8h3l.5-3H14V8c0-.9.4-1.5 1.7-1.5H18V3.8c-.7-.1-1.6-.2-2.7-.2-2.7 0-4.5 1.6-4.5 4.6V10H8v3h2.8v8"/></svg>
+            <strong>Facebook</strong><span>Danessah Berganio</span>
+          </a>
+        </div>
+        <img class="about-bear" src="public/ice-bear-face.png" alt="Ice Bear mascot" />
+      </section>
+    </div>`;
+}
+
 function renderPage() {
   switch (state.activeTool) {
+    case "about":
+      return renderAbout();
     case "tax":
       return renderTax();
     case "loops":
@@ -587,6 +857,44 @@ function render() {
       }
     }
   }
+  initializeMemoryFilmstrip();
+}
+
+function initializeMemoryFilmstrip() {
+  memoryVideoObserver?.disconnect();
+  const videos = app.querySelectorAll(".filmstrip-video");
+  if (!videos.length) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const loadVideo = (video, shouldPlay) => {
+    if (!video.src) {
+      video.src = video.dataset.videoSrc;
+      video.load();
+    }
+    if (shouldPlay) {
+      video.play().catch((error) => {
+        console.warn(`Could not autoplay memory video ${video.getAttribute("aria-label")}.`, error);
+      });
+    } else {
+      video.pause();
+    }
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    videos.forEach((video) => loadVideo(video, !reducedMotion));
+    return;
+  }
+
+  memoryVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(({ target, isIntersecting }) => {
+      if (isIntersecting) {
+        loadVideo(target, !reducedMotion);
+      } else {
+        target.pause();
+      }
+    });
+  }, { rootMargin: "250px" });
+  videos.forEach((video) => memoryVideoObserver.observe(video));
 }
 
 function saveHistory() {
@@ -760,6 +1068,12 @@ appShell.addEventListener("click", (event) => {
       state.conversionSubmitted = false;
       render();
       break;
+    case "memory-step": {
+      const direction = Number(button.dataset.direction);
+      state.memorySlide = (state.memorySlide + direction + ABOUT_MEMORY_COUNT) % ABOUT_MEMORY_COUNT;
+      render();
+      break;
+    }
     case "delete-employee": {
       const line = Number(button.dataset.line);
       state.employees.splice(line - 1, 1);
