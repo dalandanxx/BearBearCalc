@@ -624,9 +624,10 @@ function renderAbout() {
 
   const filmstripVideo = (index, duplicate = false) => {
     const number = String(index + 1).padStart(2, "0");
+    const poster = index === 6 ? ' poster="public/about/videos/posters/memory-07.jpg" preload="auto"' : ' preload="metadata"';
     return `
       <div class="filmstrip-frame">
-        <video class="filmstrip-video" data-video-src="public/about/videos/memory-${number}.mp4" muted loop playsinline preload="none" aria-label="Looping memory video ${number}"${duplicate ? ' tabindex="-1" aria-hidden="true"' : ""}></video>
+        <video class="filmstrip-video" data-video-src="public/about/videos/memory-${number}.mp4" muted loop playsinline${poster} aria-label="Looping memory video ${number}"${duplicate ? ' tabindex="-1" aria-hidden="true"' : ""}></video>
         <span>${number}</span>
       </div>`;
   };
